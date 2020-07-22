@@ -281,9 +281,9 @@ class BCSupervisionAPI {
         // 结束后进行上报
         await BCSupervisionAPI.inspectionReport();
 
-        if(global.inspectionHeight){
-            global.inspectionOffset = global.inspectionHeight;
-        }
+        global.inspectionHeight = 10;
+        global.inspectionOffset = 10;
+        
         global.inspectionStatus = "complete";
     }
 
