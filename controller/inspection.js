@@ -237,44 +237,29 @@ class InspectionController {
             return ;
         }
 
+        // 状态需要根据发送来的指令的执行情况来判断
+        //  status: complete表示巡检完成，failure表示询巡检失败，processing表示巡检执⾏中，none表示巡检任务已取消
 
-       // "code":0,"message":"成功","data":{"status":"complete","height":null,"offset":null}}
-        if(global.taskId === undefined || global.taskId === "" || global.taskId != taskIdInfo.taskId ){
-    
+        if(global.inspectionMap != undefined && global.inspectionMap.has(taskIdInfo.taskId)){
+
+            var item = global.inspectionMap.get(taskIdInfo.taskId);
             ctx.body = {
-                success: false,
-                message: "不存在该巡检任务: " + taskIdInfo.taskId
+                success:true,
+                message:"ok",
+                data:{
+                    status: item.status,
+                    height: item.height,
+                    offset: item.offset
+                }
             };
+
             return ;
         }
 
-        //  判断 taskIdInfo.taskId 的修改状态
-        var inspectionStatus = INSPECTION_STATUS_PROCESSING;
-        if(global.inspectionStatus != undefined){
-            inspectionStatus = global.inspectionStatus;
-        }
-
-        if(global.inspectionHeight === undefined){
-            global.inspectionHeight = 0;
-        }
-
-        if(global.inspectionOffset === undefined){
-            global.inspectionOffset = 0;
-        }
-
-        //  1008 链上监管-下达获取巡检状态
         ctx.body = {
-            success:true,
-            message:"ok",
-            data:{
-                status: inspectionStatus,
-                height: global.inspectionHeight,
-                offset: global.inspectionOffset,
-            }
+            success: false,
+            message: "不存在该巡检任务: " + taskIdInfo.taskId
         };
-
-        // 状态需要根据发送来的指令的执行情况来判断
-        //  status: complete表示巡检完成，failure表示询巡检失败，processing表示巡检执⾏中，none表示巡检任务已取消
     }
 
     /**
@@ -332,9 +317,21 @@ class InspectionController {
                 return ;
             }
             // 2 一个任务尚未执行完毕，不能开启第二个任务
-           
+
+            if(global.inspectionLst === undefined){
+
+                global.inspectionMap = new Map();
+            }
+
+            var inspectionItem = {
+                status: INSPECTION_STATUS_PROCESSING,
+                height: 0,
+                offset: 0
+             };
+
+            global.inspectionMap.set(taskIdInfo.taskId ,inspectionItem);  
             global.taskStartTime = Date.now();
-            global.inspectionStatus = INSPECTION_STATUS_PROCESSING;     
+   
             // 存储  taskIdInfo.taskId  
             global.taskId = taskIdInfo.taskId;
 
@@ -407,32 +404,34 @@ class InspectionController {
         }
 
         console.log(JSON.stringify(ctx.params));
-
         var taskIdInfo  = ctx.params;
         if(taskIdInfo.taskId != undefined ){
 
-            // 取消对于 任务号 :tashID 的监管
-            // global.taskId      
-            if(taskIdInfo.taskId === global.taskId){
-                global.taskId = "";
-                global.inspectionHeight = 0;
-                global.inspectionOffset = 0;
+
+            if(global.inspectionMap != undefined && global.inspectionMap.has(taskIdInfo.taskId)){
+
+                var inspectionItem = {
+                    status: INSPECTION_STATUS_NONE,
+                    height: 0,
+                    offset: 0
+                 };
+
+                global.inspectionMap.set(taskIdInfo.taskId,inspectionItem);
 
                 ctx.body = {
                     success: true,
                     message: "ok",
                 };
-
-            }else{
-
-                var errorInfo = "未循检" + taskIdInfo.taskId;
-                ctx.body = {
-                    success: false,
-                    message: errorInfo
-                };
-
+                return ;
             }
 
+        
+            var errorInfo = "未循检" + taskIdInfo.taskId;
+            ctx.body = {
+                success: false,
+                message: errorInfo
+            };
+   
    
         }else{
             ctx.body = {

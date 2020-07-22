@@ -281,10 +281,22 @@ class BCSupervisionAPI {
         // 结束后进行上报
         await BCSupervisionAPI.inspectionReport();
 
-        global.inspectionHeight = 10;
-        global.inspectionOffset = 10;
+        if(global.inspectionLst === undefined){
+            global.inspectionMap = new Map();
+        }
+
+        var inspectionItem = {
+            status: "complete",
+            height: 10,
+            offset: 10
+         };
+
+        global.inspectionMap.set(taskId,inspectionItem);
+
+        // global.inspectionHeight = 10;
+        // global.inspectionOffset = 10;
         
-        global.inspectionStatus = "complete";
+        // global.inspectionStatus = "complete";
     }
 
 
