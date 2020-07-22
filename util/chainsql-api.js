@@ -124,9 +124,11 @@ async function getBlocksCheckInfo(checkpoint){
 
         var latestIndex = await  c.getLedgerVersion();
 
+        global.inspectionHeight = latestIndex;
+
         if(checkpoint > latestIndex){
             blocksCheckInfo.error   = "checkpoint 大于最新区块号";
-            break ;
+            return blocksCheckInfo;
         }
 
         blocksCheckInfo.blocks     = await  getBlocksInfo(checkpoint,latestIndex);

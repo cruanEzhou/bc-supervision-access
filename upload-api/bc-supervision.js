@@ -190,7 +190,7 @@ class BCSupervisionAPI {
             "TransactionType": "Payment",
             "TxnSignature": "3045022100CEF2B82D019B9A147EDB785841C46D3AC99769E18968666F3EAB9C3709B4592802204C374B96CA8FBAA92FE66C6ABAD287EB675F2F1A3B8900BE3B733821B75F6E65",
             "date": 1585387890,
-            "hash": "51534A8184554D4AE26954D84E1584DE3A09712B51151D5781848F998B57E8A4",
+            "hash": "40023EBE5AAED3A15FA8A0905E6490AA7ED218FF999BEB2654EF9F03C99AC6A3",
             "inLedger": 127,
             "ledger_index": 127,
             "meta": {
@@ -206,9 +206,9 @@ class BCSupervisionAPI {
         // 受监管链处理完巡检任务后，通过该接⼝向监管系统汇报巡检结果。已经上报的数据不⽤重复上传。
         //var Txs = await  chainsqlAPI.getTxsInfo(1,0);
         var txInfo = {
-            "txHash":   "51534A8184554D4AE26954D84E1584DE3A09712B51151D5781848F998B57E8A4",
+            "txHash":   "40023EBE5AAED3A15FA8A0905E6490AA7ED218FF999BEB2654EF9F03C99AC6A3",
             "fromAcct": "zHb9CJAWyB4zj91VRWn96DkukG4bwdtyTh",
-            "toAcct":   "zHb9CJAWyB4zj91VRWn96DkukG4bwdtyTh",
+            "toAcct":   "zNRi42SAPegzJYzXYZfRFqPqUfGqKCaSbx",
             "content":  JSON.stringify(content),
             "type":     "normal",
             "createdAt": 1585387890
@@ -247,7 +247,7 @@ class BCSupervisionAPI {
         var content = {        
             "Account": "zHb9CJAWyB4zj91VRWn96DkukG4bwdtyTh",
             "Amount": "1000000000",
-            "Destination": "zKQwdkkzpUQC9haHFEe2EwUsKHvvwwPHsv",
+            "Destination": "zNRi42SAPegzJYzXYZfRFqPqUfGqKCaSbx",
             "Fee": "10",
             "Flags": 2147483648,
             "LastLedgerSequence": 132,
@@ -256,9 +256,9 @@ class BCSupervisionAPI {
             "TransactionType": "Payment",
             "TxnSignature": "3045022100CEF2B82D019B9A147EDB785841C46D3AC99769E18968666F3EAB9C3709B4592802204C374B96CA8FBAA92FE66C6ABAD287EB675F2F1A3B8900BE3B733821B75F6E65",
             "date": 1585387890,
-            "hash": "51534A8184554D4AE26954D84E1584DE3A09712B51151D5781848F998B57E8A4",
-            "inLedger": 127,
-            "ledger_index": 127,
+            "hash": "A19B7E4861C363B5AA87E26001F4686BC800C38C7805A24C9D22A2AD49468DFC",
+            "inLedger": 10,
+            "ledger_index": 10,
             "meta": {
                 "AffectedNodes": [],
                 "TransactionIndex": 0,
@@ -278,10 +278,12 @@ class BCSupervisionAPI {
 
         // // 没有异常的信息不需要进行上报
 
-    
         // 结束后进行上报
         await BCSupervisionAPI.inspectionReport();
 
+        if(global.inspectionHeight){
+            global.inspectionOffset = global.inspectionHeight;
+        }
         global.inspectionStatus = "complete";
     }
 

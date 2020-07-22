@@ -232,27 +232,34 @@ class InspectionController {
             
             ctx.body = {
                 success: false,
-                message: "Params taskId not found!"
+                message: "params taskId not found!"
             };
             return ;
         }
 
 
+       // "code":0,"message":"成功","data":{"status":"complete","height":null,"offset":null}}
         if(global.taskId === undefined || global.taskId === "" || global.taskId != taskIdInfo.taskId ){
     
             ctx.body = {
-                success:true,
-                message:"ok",
-                data:{
-                    status: INSPECTION_STATUS_NONE
-                }
+                success: false,
+                message: "不存在该巡检任务: " + taskIdInfo.taskId
             };
             return ;
         }
+
         //  判断 taskIdInfo.taskId 的修改状态
-        var inspectionStatus = INSPECTION_STATUS_NONE;
+        var inspectionStatus = INSPECTION_STATUS_PROCESSING;
         if(global.inspectionStatus != undefined){
             inspectionStatus = global.inspectionStatus;
+        }
+
+        if(global.inspectionHeight === undefined){
+            global.inspectionHeight = 0;
+        }
+
+        if(global.inspectionOffset === undefined){
+            global.inspectionOffset = 0;
         }
 
         //  1008 链上监管-下达获取巡检状态
@@ -260,7 +267,9 @@ class InspectionController {
             success:true,
             message:"ok",
             data:{
-                status: inspectionStatus
+                status: inspectionStatus,
+                height: global.inspectionHeight,
+                offset: global.inspectionOffset,
             }
         };
 
@@ -324,16 +333,14 @@ class InspectionController {
             }
             // 2 一个任务尚未执行完毕，不能开启第二个任务
 
-
-            global.inspectionStatus = INSPECTION_STATUS_PROCESSING;
-        
+            global.inspectionStatus = INSPECTION_STATUS_PROCESSING;     
             setTimeout(function(){
                
                 global.taskStartTime = Date.now();
                 // 存储  taskIdInfo.taskId  
                 global.taskId = taskIdInfo.taskId;
                 BCSupervisionAPI.startInspection(global.taskId);
-            },60000);
+            },10000);
              
            
             // 存全局变量 
@@ -465,7 +472,7 @@ class InspectionController {
 
         // 1004 下发管控指令
         // 权限验证
-        var bVerified = InspectionController.authorizationVerify(ctx);
+        var bVerified = await InspectionController.authorizationVerify(ctx);
         if(!bVerified){
 
             ctx.body = {
@@ -536,7 +543,7 @@ class InspectionController {
 
         // 1005 ⼼跳检测
         // 权限验证
-        var bVerified = InspectionController.authorizationVerify(ctx);
+        var bVerified = await InspectionController.authorizationVerify(ctx);
         if(!bVerified){
 
             ctx.body = {
@@ -601,7 +608,7 @@ class InspectionController {
         var content = {        
                 "Account": "zHb9CJAWyB4zj91VRWn96DkukG4bwdtyTh",
                 "Amount": "1000000000",
-                "Destination": "zKQwdkkzpUQC9haHFEe2EwUsKHvvwwPHsv",
+                "Destination": "zNRi42SAPegzJYzXYZfRFqPqUfGqKCaSbx",
                 "Fee": "10",
                 "Flags": 2147483648,
                 "LastLedgerSequence": 132,
@@ -609,10 +616,10 @@ class InspectionController {
                 "Raw": "内容违反相关法规，不予显示",
                 "TransactionType": "Payment",
                 "TxnSignature": "3045022100CEF2B82D019B9A147EDB785841C46D3AC99769E18968666F3EAB9C3709B4592802204C374B96CA8FBAA92FE66C6ABAD287EB675F2F1A3B8900BE3B733821B75F6E65",
-                "date": 647503387,
-                "hash": "51534A8184554D4AE26954D84E1584DE3A09712B51151D5781848F998B57E8A4",
-                "inLedger": 127,
-                "ledger_index": 127,
+                "date": 1585387890,
+                "hash": "A19B7E4861C363B5AA87E26001F4686BC800C38C7805A24C9D22A2AD49468DFC",
+                "inLedger": 10,
+                "ledger_index": 10,
                 "meta": {
                     "AffectedNodes": [],
                     "TransactionIndex": 0,
