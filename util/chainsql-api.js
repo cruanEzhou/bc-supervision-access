@@ -116,30 +116,26 @@ async function getBlocksCheckInfo(checkpoint){
 
     blocksCheckInfo.blocks        = [];
     blocksCheckInfo.checkpoint    = checkpoint;
+    blocksCheckInfo.error         = "";
     
     try{
 
         if(checkpoint <= 0)  checkpoint = 1;
 
-        if(global.preCheckpoint == undefined){
-            global.preCheckpoint = 0; 
+        var latestIndex = await  c.getLedgerVersion();
 
-            if(false){
-
-                var minIndex =  372737;
-                global.preCheckpoint = minIndex -1;
-                checkpoint           = minIndex + CHECK_NUMS;              
-            }
+        if(checkpoint > latestIndex){
+            blocksCheckInfo.error   = "checkpoint 大于最新区块号";
+            break ;
         }
-     
-        // [global.preCheckpoint + 1,checkpoint] 如果超过20个则分配处理
-        blocksCheckInfo.blocks     = await  getBlocksInfo(global.preCheckpoint + 1 ,checkpoint);
-        blocksCheckInfo.checkpoint = global.preCheckpoint + 1 + blocksCheckInfo.blocks.length;
-        global.preCheckpoint       = blocksCheckInfo.checkpoint - 1;
+
+        blocksCheckInfo.blocks     = await  getBlocksInfo(checkpoint,latestIndex);
+        blocksCheckInfo.checkpoint = latestIndex;
 
     }catch(e){
-
         console.error("err getBlocksInfo", e);
+
+        blocksCheckInfo.error = "获取区块信息失败";
     }
 
     return blocksCheckInfo;
@@ -155,19 +151,17 @@ async function getBlocksInfo(fromIndex,toIndex){
         return blocks;
     }
 
-
     try{
 
-        var latestIndex = await  c.getLedgerVersion();
+       // var latestIndex = await  c.getLedgerVersion();
 
-        if(toIndex > latestIndex ){
-            toIndex = latestIndex;
-        }
+        // if(toIndex > latestIndex ){
+        //     toIndex = latestIndex;
+        // }
 
-        if(toIndex - fromIndex + 1 > CHECK_NUMS){
-            toIndex = fromIndex + CHECK_NUMS - 1;
-        }
-
+        // if(toIndex - fromIndex + 1 > CHECK_NUMS){
+        //     toIndex = fromIndex + CHECK_NUMS - 1;
+        // }
 
         for(var index = fromIndex; index <= toIndex ; index++){
 
@@ -191,9 +185,7 @@ async function getBlocksInfo(fromIndex,toIndex){
 
                     
                     var txInfo = await c.getTransaction(txs[txIndex]);
-
                     var txSrcAndDes = getTxSrcAndDes(txInfo);
-
                     txsArr.push({hash:txs[txIndex],fromAcct:txSrcAndDes.fromAcct,toAcct:txSrcAndDes.toAcct});
 
                 }

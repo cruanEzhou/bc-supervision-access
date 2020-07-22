@@ -323,6 +323,9 @@ class InspectionController {
                 return ;
             }
             // 2 一个任务尚未执行完毕，不能开启第二个任务
+
+
+            global.inspectionStatus = INSPECTION_STATUS_PROCESSING;
         
             setTimeout(function(){
                
@@ -330,7 +333,7 @@ class InspectionController {
                 // 存储  taskIdInfo.taskId  
                 global.taskId = taskIdInfo.taskId;
                 BCSupervisionAPI.startInspection(global.taskId);
-            },1000);
+            },60000);
              
            
             // 存全局变量 
@@ -546,16 +549,27 @@ class InspectionController {
         console.log(JSON.stringify(ctx.request))
         console.log(JSON.stringify(ctx.request.body))
 
+        //
         // {
-        //     "taskId":"0x2345678abc12",
-        //     "checkpoint": 0 
+        //    "taskId":"0x2345678abc12",
+        //    "checkpoint": 0 
         // }
+        // 
         var heartbeatInfo = ctx.request.body;
         if(heartbeatInfo.taskId != undefined && heartbeatInfo.checkpoint != undefined){
 
             // 存储  taskIdInfo.taskId  
             global.heartbeatId  = heartbeatInfo.taskId;   
             var checkInfo       = await chainsqlAPI.getBlocksCheckInfo(heartbeatInfo.checkpoint);
+            if( checkInfo.error != undefined && checkInfo.error != "" ){
+
+                ctx.body = {
+                    success: false,
+                    message: checkInfo.error
+                };
+                return ;
+            }
+
             ctx.body = {
                 success: true,
                 message: "ok",
