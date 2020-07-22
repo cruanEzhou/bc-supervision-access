@@ -13,7 +13,7 @@ const  INSPECTION_STATUS_FAILURE    = "failure";
 const  INSPECTION_STATUS_PROCESSING = "processing";
 const  INSPECTION_STATUS_NONE       = "none";
 
-const INTERVA_TM = 1000 * 60 * 60 // 1h
+const INTERVA_TM = 1000 * 60 // 1h
 
 class InspectionController {
 
@@ -332,13 +332,14 @@ class InspectionController {
                 return ;
             }
             // 2 一个任务尚未执行完毕，不能开启第二个任务
-
+           
+            global.taskStartTime = Date.now();
             global.inspectionStatus = INSPECTION_STATUS_PROCESSING;     
+            // 存储  taskIdInfo.taskId  
+            global.taskId = taskIdInfo.taskId;
+
             setTimeout(function(){
                
-                global.taskStartTime = Date.now();
-                // 存储  taskIdInfo.taskId  
-                global.taskId = taskIdInfo.taskId;
                 BCSupervisionAPI.startInspection(global.taskId);
             },10000);
              
@@ -414,6 +415,8 @@ class InspectionController {
             // global.taskId      
             if(taskIdInfo.taskId === global.taskId){
                 global.taskId = "";
+                global.inspectionHeight = 0;
+                global.inspectionOffset = 0;
 
                 ctx.body = {
                     success: true,
