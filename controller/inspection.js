@@ -249,6 +249,11 @@ class InspectionController {
             }
 
             var item = global.inspectionMap.get(taskIdInfo.taskId);
+            // 再无效的列表中
+            if(global.inspectionInvlidateSet.has(taskIdInfo.taskId)){
+                    item.status = INSPECTION_STATUS_NONE;
+            }
+            
             ctx.body = {
                 success:true,
                 message:"ok",
@@ -344,7 +349,7 @@ class InspectionController {
             setTimeout(function(){
                
                 BCSupervisionAPI.startInspection(global.taskId);
-            },10000);
+            },1000);
              
            
             // 存全局变量 
@@ -416,6 +421,10 @@ class InspectionController {
 
             if(global.inspectionMap != undefined && global.inspectionMap.has(taskIdInfo.taskId)){
 
+                if(global.inspectionSet === undefined){
+                    global.inspectionInvlidateSet = new Set();
+                }
+                global.inspectionInvlidateSet.add(taskIdInfo.taskId);
 
                 var item = global.inspectionMap.get(taskIdInfo.taskId);
                 var inspectionItem = {

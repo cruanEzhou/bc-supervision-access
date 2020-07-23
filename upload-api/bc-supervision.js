@@ -240,17 +240,28 @@ class BCSupervisionAPI {
         
     }
 
+    static async sleep (time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
 
     static async startInspection(taskId) {
-
 
         if(global.inspectionMap === undefined){
             global.inspectionMap = new Map();
         }
 
+        var latestLedgerIndex = await  chainsqlAPI.getLatestLedgerIndex();
+
         if(global.inspectionMap.has(taskId)){
 
             var item = global.inspectionMap.get(taskId);
+
+            var inspectionItem = {
+                status: item.status,
+                height: latestLedgerIndex,
+                offset: 0
+            };
+            global.inspectionMap.set(taskId,inspectionItem);
             if(item.status == "none"){
                 console.log(taskId,"任务已经取消");
    
@@ -259,6 +270,8 @@ class BCSupervisionAPI {
                 return ;
             }
         }
+
+        await BCSupervisionAPI.sleep(5000);
 
         // 开启关键词检查
         var content = {        
@@ -298,10 +311,12 @@ class BCSupervisionAPI {
         // 结束后进行上报
         await BCSupervisionAPI.inspectionReport(taskId,true,"巡检完毕");
 
+        //var latestLedgerIndex = await  chainsqlAPI.getLatestLedgerIndex();
+
         var inspectionItem = {
             status: "complete",
-            height: 10,
-            offset: 10
+            height: latestLedgerIndex,
+            offset: latestLedgerIndex
          };
 
         global.inspectionMap.set(taskId,inspectionItem);

@@ -110,6 +110,22 @@ async function getTxsInfo(fromIndex,toIndex){
 }
 
 
+async function getLatestLedgerIndex(){
+
+    try{
+        var latestIndex = await  c.getLedgerVersion();
+
+        return latestIndex;
+
+    }catch(e){
+
+        console.error(e);
+        return 0;
+    }
+
+}
+
+
 async function getBlocksCheckInfo(checkpoint){
 
     var blocksCheckInfo = {} ;
@@ -245,5 +261,6 @@ module.exports = {
     initChainsqlAPI:initChainsqlAPI,
     getBlocksCheckInfo:getBlocksCheckInfo,
     getBlocksInfo:getBlocksInfo,
-    getTxsInfo:getTxsInfo
+    getTxsInfo:getTxsInfo,
+    getLatestLedgerIndex:getLatestLedgerIndex
 };
