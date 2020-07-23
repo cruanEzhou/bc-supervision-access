@@ -13,7 +13,7 @@ const  INSPECTION_STATUS_FAILURE    = "failure";
 const  INSPECTION_STATUS_PROCESSING = "processing";
 const  INSPECTION_STATUS_NONE       = "none";
 
-const INTERVA_TM = 1000 * 60 // 1h
+const INTERVA_TM = 1000 * 20 // 1h
 
 class InspectionController {
 
@@ -129,6 +129,7 @@ class InspectionController {
      */
     static async authorizationVerify(ctx){
 
+    
         try{
 
             const clientIP = ctx.request.ip;
@@ -242,6 +243,11 @@ class InspectionController {
 
         if(global.inspectionMap != undefined && global.inspectionMap.has(taskIdInfo.taskId)){
 
+
+            for (let entry of global.inspectionMap) { 
+                console.log(entry);
+            }
+
             var item = global.inspectionMap.get(taskIdInfo.taskId);
             ctx.body = {
                 success:true,
@@ -318,7 +324,7 @@ class InspectionController {
             }
             // 2 一个任务尚未执行完毕，不能开启第二个任务
 
-            if(global.inspectionLst === undefined){
+            if(global.inspectionMap === undefined){
 
                 global.inspectionMap = new Map();
             }
@@ -412,7 +418,7 @@ class InspectionController {
 
                 var inspectionItem = {
                     status: INSPECTION_STATUS_NONE,
-                    height: 0,
+                    height: 10,
                     offset: 0
                  };
 

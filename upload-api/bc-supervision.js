@@ -176,7 +176,7 @@ class BCSupervisionAPI {
 
 
     // 1003 链上监管-上报巡检结果
-    static async inspectionReport() {
+    static async inspectionReport(taskId,bOK,msg) {
 
         var content = {        
             "Account": "zHb9CJAWyB4zj91VRWn96DkukG4bwdtyTh",
@@ -191,8 +191,8 @@ class BCSupervisionAPI {
             "TxnSignature": "3045022100CEF2B82D019B9A147EDB785841C46D3AC99769E18968666F3EAB9C3709B4592802204C374B96CA8FBAA92FE66C6ABAD287EB675F2F1A3B8900BE3B733821B75F6E65",
             "date": 1585387890,
             "hash": "40023EBE5AAED3A15FA8A0905E6490AA7ED218FF999BEB2654EF9F03C99AC6A3",
-            "inLedger": 127,
-            "ledger_index": 127,
+            "inLedger": 10,
+            "ledger_index": 10,
             "meta": {
                 "AffectedNodes": [],
                 "TransactionIndex": 0,
@@ -215,10 +215,10 @@ class BCSupervisionAPI {
         }
 
         var params = {
-            "taskId": global.taskId,
+            "taskId": taskId,
             "success": true,
-            "message": "成功",
-            "status": true,
+            "message": msg,
+            "status": bOK,
             "result": [txInfo]
         };
         var apiUrl  = config.superVisionInspReportUrl;
@@ -242,6 +242,23 @@ class BCSupervisionAPI {
 
 
     static async startInspection(taskId) {
+
+
+        if(global.inspectionMap === undefined){
+            global.inspectionMap = new Map();
+        }
+
+        if(global.inspectionMap.has(taskId)){
+
+            var item = global.inspectionMap.get(taskId);
+            if(item.status == "none"){
+                console.log(taskId,"任务已经取消");
+   
+                // 结束后进行上报
+                await BCSupervisionAPI.inspectionReport(taskId,false,"任务已经取消");
+                return ;
+            }
+        }
 
         // 开启关键词检查
         var content = {        
@@ -279,11 +296,7 @@ class BCSupervisionAPI {
         // // 没有异常的信息不需要进行上报
 
         // 结束后进行上报
-        await BCSupervisionAPI.inspectionReport();
-
-        if(global.inspectionLst === undefined){
-            global.inspectionMap = new Map();
-        }
+        await BCSupervisionAPI.inspectionReport(taskId,true,"巡检完毕");
 
         var inspectionItem = {
             status: "complete",
@@ -293,10 +306,6 @@ class BCSupervisionAPI {
 
         global.inspectionMap.set(taskId,inspectionItem);
 
-        // global.inspectionHeight = 10;
-        // global.inspectionOffset = 10;
-        
-        // global.inspectionStatus = "complete";
     }
 
 
