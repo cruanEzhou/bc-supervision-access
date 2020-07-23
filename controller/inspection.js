@@ -416,10 +416,12 @@ class InspectionController {
 
             if(global.inspectionMap != undefined && global.inspectionMap.has(taskIdInfo.taskId)){
 
+
+                var item = global.inspectionMap.get(taskIdInfo.taskId);
                 var inspectionItem = {
                     status: INSPECTION_STATUS_NONE,
-                    height: 10,
-                    offset: 0
+                    height: item.height,
+                    offset:  item.offset
                  };
 
                 global.inspectionMap.set(taskIdInfo.taskId,inspectionItem);
