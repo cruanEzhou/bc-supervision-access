@@ -249,6 +249,11 @@ class InspectionController {
             }
 
             var item = global.inspectionMap.get(taskIdInfo.taskId);
+
+            if(global.inspectionInvlidateSet === undefined){
+                global.inspectionInvlidateSet = new Set();
+            }
+
             // 再无效的列表中
             if(global.inspectionInvlidateSet.has(taskIdInfo.taskId)){
                     item.status = INSPECTION_STATUS_NONE;
