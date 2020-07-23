@@ -273,6 +273,19 @@ class BCSupervisionAPI {
 
         await BCSupervisionAPI.sleep(5000);
 
+
+        if(global.inspectionMap.has(taskId)){
+
+            var item = global.inspectionMap.get(taskId);
+            if(item.status == "none"){
+                console.log(taskId,"任务已经取消");
+                // 结束后进行上报
+                await BCSupervisionAPI.inspectionReport(taskId,false,"任务已经取消");
+                return ;
+            }
+        }
+
+
         // 开启关键词检查
         var content = {        
             "Account": "zHb9CJAWyB4zj91VRWn96DkukG4bwdtyTh",
